@@ -31,6 +31,8 @@
         <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
         <rest-assured.version>5.5.1</rest-assured.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <sonar.organization>joao-lucas-de-oliveira-lima</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <dependencies>
         <dependency>
