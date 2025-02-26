@@ -1,22 +1,28 @@
 name: CI
-
 on:
+  workflow_dispatch:
   push:
     branches:
-      - main
+      [main, test]
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+    types:
+      [opened, synchronize, reopened]
 
 jobs:
-  build:
-    name: Build and analyze
+  test_and_deploy:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
@@ -29,12 +35,8 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Build and analyze
-        run: mvn -B verify jacoco:report org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Joao-Lucas-de-Oliveira-Lima_software-reuse-pattern
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn install -B verify jacoco:report org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=4-Oliveira-Lima_github-actions-azure-pipeline
